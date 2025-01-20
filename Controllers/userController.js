@@ -76,43 +76,36 @@ export const userProfile = async (req, res) => {
     }
   };
 
-// Login User
-export const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
 
-    // Validate input
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+
+ //login user || signin
+  export const loginUser = async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: "User Not Found" });
+      }
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
+        return res.status(400).json({ message: "Invalid Password" });
+      }
+  
+      const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
+      user.token = token;
+      await user.save();
+      res
+        .status(200)
+        .json({ message: "User Logged In Successfully", token: token });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
+  };
+  
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
-      return res.status(401).json({ message: "Invalid password" });
-    }
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { _id: user._id, name: user.name, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    res.status(200).json({
-      message: "User logged in successfully",
-      token,
-      user: { _id: user._id, name: user.name, email: user.email },
-    });
-  } catch (error) {
-    console.error("Login Error:", error.message);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
 
 // Forgot Password
 export const forgotPassword = async (req, res) => {
@@ -142,7 +135,7 @@ export const forgotPassword = async (req, res) => {
       to: user.email,
       subject: "Password Reset Link",
       text: `Please click the link to reset your password:
-https://frontend-hotel-booking-system.vercel.app/reset-password/${user._id}/${token}`,
+ http://localhost:5173/reset-password/${user._id}/${token}`,
     };
 
     transporter.sendMail(mailOptions, (error) => {
@@ -158,6 +151,7 @@ https://frontend-hotel-booking-system.vercel.app/reset-password/${user._id}/${to
   }
 };
 
+// Reset Password
 export const resetPassword = async (req, res) => {
     try {
         const { id, token } = req.params;
@@ -196,5 +190,8 @@ export const resetPassword = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+
+ 
 
 
