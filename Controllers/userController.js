@@ -135,7 +135,7 @@ export const forgotPassword = async (req, res) => {
       to: user.email,
       subject: "Password Reset Link",
       text: `Please click the link to reset your password:
- http://localhost:5173/reset-password/${user._id}/${token}`,
+ https://mern-frontend-hotel-booking-system.vercel.app/reset-password/${user._id}/${token}`,
     };
 
     transporter.sendMail(mailOptions, (error) => {
