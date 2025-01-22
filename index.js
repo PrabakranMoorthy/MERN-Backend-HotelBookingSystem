@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDb from './Database/dbConfig.js';
-import hotelRoutes from './Routers/hotelRouter.js';
+import roomRoutes from './Routers/roomRouter.js';
 import paymentRoutes from './Routers/paymentRouter.js';
 import userRoutes from './Routers/userRouter.js';
 
@@ -20,7 +20,7 @@ app.get("/",(req,res)=>{
 })
 
 // Use Routes
-app.use('/api/hotels', hotelRoutes);
+app.use('/api/rooms', roomRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/payments', paymentRoutes);
 
